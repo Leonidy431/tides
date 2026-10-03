@@ -1,0 +1,57 @@
+{
+ "candidates": 16,
+ "triples": 560,
+ "ready_now": [
+  [
+   159,
+   [
+    "equilibrium",
+    "openmeteo",
+    "ioc"
+   ]
+  ]
+ ],
+ "overall": [
+  [
+   161,
+   [
+    "equilibrium",
+    "ioc",
+    "eot20"
+   ]
+  ],
+  [
+   159,
+   [
+    "equilibrium",
+    "openmeteo",
+    "ioc"
+   ]
+  ],
+  [
+   158,
+   [
+    "equilibrium",
+    "ioc",
+    "tpxo"
+   ]
+  ],
+  [
+   158,
+   [
+    "equilibrium",
+    "ioc",
+    "got410"
+   ]
+  ],
+  [
+   157,
+   [
+    "equilibrium",
+    "ioc",
+    "fes2014"
+   ]
+  ]
+ ],
+ "note": "scores are the chorus's estimates [В]"
+}

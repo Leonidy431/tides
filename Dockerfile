@@ -36,7 +36,7 @@ FROM base AS runtime
 USER tides
 EXPOSE 9050
 
-LABEL version="0.1.0"
+LABEL version="0.2.0"
 LABEL permissions='{\
   "ExposedPorts": {"9050/tcp": {}},\
   "HostConfig": {\
@@ -50,7 +50,7 @@ LABEL company='{\
   "email": ""\
 }'
 LABEL type="tool"
-LABEL tags='["water", "lake", "sea", "river", "tide", "rov"]'
+LABEL tags='["water", "lake", "sea", "river", "tide", "rov", "gps", "global"]'
 LABEL readme="https://raw.githubusercontent.com/Leonidy431/tides/main/README.md"
 LABEL links='{"source": "https://github.com/Leonidy431/tides"}'
 LABEL requirements="core >= 1.1"

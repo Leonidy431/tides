@@ -12,9 +12,9 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, PlainTextResponse
 
 from app import explain as explain_mod
-from app import model
+from app import model, positions, sources
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           "static")
 
@@ -22,10 +22,12 @@ app = FastAPI(
     title="tides",
     version=VERSION,
     description=(
-        "Honest water levels for Issyk-Kul, its rivers and the Caspian: "
-        "astronomical tide where it exists (mm..cm), glacier-melt daily "
-        "cycle in the rivers (no tide there), wind setup and seasonal "
-        "floods.  Every parameter is tagged [П] source or [В] estimate."
+        "Honest water levels at ANY point of the planet that has GPS "
+        "coordinates (BlueOS position or lat/lon), from three independent "
+        "sources run side by side: equilibrium-tide theory (offline), a "
+        "global ocean model and the nearest tide gauge, with their "
+        "agreement stated; plus the curated sites of Issyk-Kul, its "
+        "rivers and the Caspian.  Every number says where it came from."
     ),
 )
 
@@ -42,8 +44,10 @@ def register_service():
     return {
         "name": "Tides",
         "description": (
-            "Приливы, нагоны и суточный цикл таяния: Иссык-Куль, реки "
-            "бассейна и Каспий. Honest levels, every number tagged."
+            "Приливы в любой точке планеты по GPS из BlueOS: три "
+            "независимых источника (теория, модель океана, ближайший "
+            "мареограф) и их согласие; Иссык-Куль и Каспий. Honest "
+            "levels, every number says where it came from."
         ),
         "icon": "mdi-waves",
         "company": "Leonidy431",
@@ -140,3 +144,50 @@ def explain(site: str):
         return explain_mod.explain(site)
     except KeyError as exc:
         raise HTTPException(404, "unknown site: %s" % site) from exc
+
+
+def _hours_start(start):
+    """Start at the given hour, or at this UTC hour."""
+    return _parse_start(start).replace(minute=0, second=0, microsecond=0)
+
+
+@app.get("/v1.0/sources")
+def list_sources():
+    """The sources, their method and licence (no network is touched)."""
+    return {"sources": sources.catalogue(),
+            "agreement": "demeaned shapes of the physical sources are "
+                         "compared; theory votes only when it is alone"}
+
+
+@app.get("/v1.0/point")
+def point(
+    lat: float = Query(..., ge=-90, le=90),
+    lon: float = Query(..., ge=-180, le=180),
+    start: str = Query(None, description="ISO-8601 UTC; default: this hour"),
+    hours: float = Query(48.0, gt=0, le=24 * 7),
+    use: str = Query(None, description="comma list, default all three"),
+):
+    """The water level at any point: three sources and their consensus."""
+    names = [n.strip() for n in use.split(",")] if use else None
+    if names and not any(n in sources.SOURCES for n in names):
+        raise HTTPException(400, "use: %s" % ", ".join(sources.SOURCES))
+    return sources.point(lat, lon, _hours_start(start), hours, names)
+
+
+@app.get("/v1.0/here")
+def here(
+    start: str = Query(None),
+    hours: float = Query(48.0, gt=0, le=24 * 7),
+    use: str = Query(None),
+):
+    """The water level where the vehicle is, by its BlueOS GPS position."""
+    pos = positions.from_blueos()
+    if pos is None:
+        raise HTTPException(
+            503, "BlueOS has no GPS fix (mavlink2rest empty or lat/lon "
+                 "zero); use /v1.0/point?lat=..&lon=.. or set BLUEOS_URL")
+    names = [n.strip() for n in use.split(",")] if use else None
+    out = sources.point(pos["lat"], pos["lon"], _hours_start(start), hours,
+                        names)
+    out["position"] = pos
+    return out
