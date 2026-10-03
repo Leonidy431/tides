@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tides — Иссык-Куль и Каспий</title>
+<style>
+  :root { --bg:#0f1720; --fg:#e6edf3; --muted:#8b98a5; --grid:#2a3644;
+          --astro:#4fc3f7; --b:#ffb74d; --c:#81c784; --total:#f06292; }
+  body { margin:0; padding:16px; background:var(--bg); color:var(--fg);
+         font:14px/1.45 system-ui, sans-serif; }
+  h1 { font-size:18px; margin:0 0 8px; }
+  form { display:flex; flex-wrap:wrap; gap:8px; align-items:end; }
+  label { display:flex; flex-direction:column; font-size:12px;
+          color:var(--muted); }
+  input, select, button { background:#18222d; color:var(--fg);
+          border:1px solid var(--grid); border-radius:4px; padding:4px 6px; }
+  svg { width:100%; height:auto; margin-top:12px; background:#121c26;
+        border-radius:6px; }
+  pre { white-space:pre-wrap; background:#121c26; padding:10px;
+        border-radius:6px; }
+  .legend span { margin-right:12px; }
+  .note { color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<h1>Tides — уровни воды: Иссык-Куль, реки, Каспий</h1>
+<p class="note">Время UTC. Каждое число модели помечено [П] источник или
+[В] оценка (см. JSON ниже). В реках приливов нет — там суточный цикл
+таяния.</p>
+<form id="f">
+  <label>Место <select id="site"></select></label>
+  <label>Начало (UTC) <input id="start" value="2026-07-15T00:00:00Z"
+    size="20"></label>
+  <label>Часов <input id="hours" type="number" value="72" min="1"
+    max="1488"></label>
+  <label>Шаг, мин <input id="step" type="number" value="30" min="1"></label>
+  <label>Ветер, м/с <input id="ws" type="number" value="0" min="0"
+    max="60"></label>
+  <label>Ветер откуда, ° <input id="wd" type="number" value="0" min="0"
+    max="360"></label>
+  <button>Построить</button>
+</form>
+<svg id="plot" viewBox="0 0 900 360"></svg>
+<div class="legend" id="legend"></div>
+<pre id="explain"></pre>
+<details><summary>Параметры и метки</summary><pre id="params"></pre>
+</details>
+<script>
+// Relative URLs keep the page working behind the BlueOS extension proxy.
+var COLORS = ["--astro", "--b", "--c", "--total"];
+function $(id) { return document.getElementById(id); }
+function css(name) {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name).trim();
+}
+function draw(data) {
+  var svg = $("plot"), W = 900, H = 360, L = 60, R = 10, T = 10, B = 40;
+  var rows = data.series, keys = Object.keys(data.units);
+  var lo = Infinity, hi = -Infinity;
+  rows.forEach(function (r) { keys.forEach(function (k) {
+    lo = Math.min(lo, r[k]); hi = Math.max(hi, r[k]); }); });
+  if (hi === lo) { hi += 1e-3; lo -= 1e-3; }
+  function x(i) { return L + (W - L - R) * i / Math.max(1, rows.length - 1); }
+  function y(v) { return T + (H - T - B) * (hi - v) / (hi - lo); }
+  var s = "";
+  for (var g = 0; g <= 4; g++) {
+    var v = lo + (hi - lo) * g / 4, yy = y(v);
+    s += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + yy + '" y2="' +
+      yy + '" stroke="' + css("--grid") + '"/>';
+    s += '<text x="4" y="' + (yy + 4) + '" fill="' + css("--muted") +
+      '" font-size="11">' + v.toPrecision(3) + '</text>';
+  }
+  [0, rows.length - 1].forEach(function (i) {
+    s += '<text x="' + Math.min(x(i), W - 150) + '" y="' + (H - 12) +
+      '" fill="' + css("--muted") + '" font-size="11">' + rows[i].t +
+      '</text>';
+  });
+  var legend = "";
+  keys.forEach(function (k, j) {
+    var col = css(COLORS[j % COLORS.length]);
+    var pts = rows.map(function (r, i) {
+      return x(i).toFixed(1) + "," + y(r[k]).toFixed(1); }).join(" ");
+    s += '<polyline fill="none" stroke-width="2" stroke="' + col +
+      '" points="' + pts + '"/>';
+    legend += '<span style="color:' + col + '">■ ' + k + ' (' +
+      data.units[k] + ')</span>';
+  });
+  svg.innerHTML = s;
+  $("legend").innerHTML = legend + '<br><span class="note">total: ' +
+    data.total_meaning + '</span>';
+  $("params").textContent = JSON.stringify(data.params_used, null, 1);
+}
+function load() {
+  var site = $("site").value;
+  var q = "v1.0/level?site=" + encodeURIComponent(site) +
+    "&start=" + encodeURIComponent($("start").value) +
+    "&hours=" + $("hours").value + "&step_min=" + $("step").value +
+    "&wind_speed=" + $("ws").value + "&wind_from=" + $("wd").value;
+  fetch(q).then(function (r) { return r.json(); }).then(draw);
+  fetch("v1.0/explain?site=" + encodeURIComponent(site))
+    .then(function (r) { return r.text(); })
+    .then(function (t) { $("explain").textContent = t; });
+}
+fetch("v1.0/sites").then(function (r) { return r.json(); })
+  .then(function (d) {
+    $("site").innerHTML = d.sites.map(function (s) {
+      return '<option value="' + s.id + '">' + s.name_ru + '</option>';
+    }).join("");
+    load();
+  });
+$("f").addEventListener("submit", function (e) { e.preventDefault(); load(); });
+$("site").addEventListener("change", load);
+</script>
+</body>
+</html>

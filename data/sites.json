@@ -1,0 +1,217 @@
+{
+  "about": "Every number carries a tag. [П] = from a cited source; [В] = estimate (вывод/оценка) by the author of this module, order of magnitude only, NOT calibrated on gauge records. A value of null means unknown.",
+  "constants": {
+    "g": {"value": 9.80665, "unit": "m/s^2", "tag": "[П] standard gravity, CGPM 1901 / ISO 80000-3"},
+    "rho_air": {"value": 1.225, "unit": "kg/m^3", "tag": "[П] ISA sea-level air density (ISO 2533); at 1600 m it is ~15 % lower, ignored [В]"},
+    "drag_coefficient": {"value": 0.0013, "unit": "1", "tag": "[П] bulk wind-stress drag coefficient of order 1.2e-3..1.3e-3 for U10 < 11 m/s (Large & Pond 1981, J. Phys. Oceanogr. 11)"},
+    "gamma2": {"value": 0.69, "unit": "1", "tag": "[П] tilt factor 1 + k2 - h2 for the body tide (Pugh & Woodworth 2014, Sea-Level Science, ch. 3)"},
+    "eq_amp_M2": {"value": 0.24233, "unit": "m", "tag": "[П] equilibrium tide amplitude, Cartwright & Tayler 1971 (latitude factor cos^2 lat)"},
+    "eq_amp_S2": {"value": 0.11274, "unit": "m", "tag": "[П] equilibrium tide amplitude, Cartwright & Tayler 1971 (latitude factor cos^2 lat)"},
+    "eq_amp_K1": {"value": 0.14156, "unit": "m", "tag": "[П] equilibrium tide amplitude, Cartwright & Tayler 1971 (latitude factor sin 2 lat)"},
+    "eq_amp_O1": {"value": 0.10055, "unit": "m", "tag": "[П] equilibrium tide amplitude, Cartwright & Tayler 1971 (latitude factor sin 2 lat)"},
+    "nodal_factors": {"value": "f=1, u=0", "unit": "1", "tag": "[В] nodal corrections omitted: changes amplitudes by up to ~4 % (M2) and ~11 % (K1), irrelevant at mm..cm scale"},
+    "lapse_rate": {"value": 0.0065, "unit": "K/m", "tag": "[П] ICAO standard atmosphere lapse rate (ISO 2533); real mountain lapse rates vary 0.004..0.008"},
+    "ddf_ice": {"value": 7.0, "unit": "mm w.e./(degC*day)", "tag": "[В] inside the ice range 6.6..20 reviewed by Hock 2003, J. Hydrology 282:104-115 [П]; not calibrated for Tien Shan"},
+    "temp_peak_local_hour": {"value": 15.0, "unit": "h local mean solar time", "tag": "[В] typical hour of daily air-temperature maximum over land"}
+  },
+  "stations": {
+    "karakol": {
+      "name": "Каракол (метеостанция)",
+      "elevation_m": {"value": 1716, "unit": "m a.s.l.", "tag": "[В] approximate station elevation"},
+      "t_mean_monthly": {"value": [-6.4, -5.0, 1.0, 8.3, 12.3, 15.6, 17.8, 17.3, 12.9, 6.6, -0.3, -4.6], "unit": "degC, Jan..Dec", "tag": "[В] approximate climatology, order of magnitude; replace with station normals"},
+      "t_half_range_monthly": {"value": [5.0, 5.0, 5.5, 6.0, 6.5, 7.0, 7.0, 7.0, 6.5, 6.0, 5.5, 5.0], "unit": "K (half of daily range)", "tag": "[В] estimate"}
+    },
+    "balykchy": {
+      "name": "Балыкчы (метеостанция)",
+      "elevation_m": {"value": 1660, "unit": "m a.s.l.", "tag": "[В] approximate station elevation"},
+      "t_mean_monthly": {"value": [-4.0, -3.0, 2.0, 8.5, 13.5, 17.5, 19.8, 19.0, 14.5, 8.0, 1.5, -2.5], "unit": "degC, Jan..Dec", "tag": "[В] approximate climatology, order of magnitude; replace with station normals"},
+      "t_half_range_monthly": {"value": [5.0, 5.0, 5.5, 6.0, 6.5, 7.0, 7.0, 7.0, 6.5, 6.0, 5.5, 5.0], "unit": "K (half of daily range)", "tag": "[В] estimate"}
+    }
+  },
+  "sites": [
+    {
+      "id": "issyk_kul_cholpon_ata",
+      "kind": "lake",
+      "name_ru": "Иссык-Куль, водомерный пост Чолпон-Ата",
+      "name_en": "Issyk-Kul lake gauge, Cholpon-Ata",
+      "lat": 42.645, "lon": 77.08,
+      "params": {
+        "mean_level": {"value": 1607, "unit": "m a.s.l.", "tag": "[В] approximate lake level of the 2020s"},
+        "lake_length": {"value": 178000, "unit": "m", "tag": "[П] commonly cited lake length ~178 km"},
+        "mean_depth": {"value": 278, "unit": "m", "tag": "[П] commonly cited mean depth ~278 m (max 668 m)"},
+        "lake_points": {"value": [[42.45, 76.25], [42.55, 76.80], [42.50, 77.40], [42.40, 77.90], [42.30, 78.30]], "unit": "[lat, lon] deg", "tag": "[В] coarse sample of the lake axis used for the mass-conserving mean"},
+        "fetch": {"value": 60000, "unit": "m", "tag": "[В] cross-lake fetch toward the north shore"},
+        "setup_depth": {"value": 278, "unit": "m", "tag": "[П] mean depth used as the setup depth"},
+        "onshore_wind_from": {"value": 180, "unit": "deg (direction the wind blows FROM)", "tag": "[В] southerly wind pushes water to the north shore"},
+        "rho_water": {"value": 1005, "unit": "kg/m^3", "tag": "[В] brackish water, salinity ~6 g/kg"},
+        "seiche_amplitude": {"value": null, "unit": "m", "tag": "неизвестно: wind-forced, few cm order [В]; not modelled as a time series"}
+      }
+    },
+    {
+      "id": "karakol_river",
+      "kind": "river_melt",
+      "name_ru": "р. Каракол (выход из ущелья)",
+      "name_en": "Karakol river at the gorge outlet",
+      "lat": 42.47, "lon": 78.43,
+      "station": "karakol",
+      "params": {
+        "melt_area": {"value": 10, "unit": "km^2", "tag": "[В] glacier + perennial snow area that melts; not measured here"},
+        "melt_elevation": {"value": 3900, "unit": "m a.s.l.", "tag": "[В] mean elevation of the melting area"},
+        "lag": {"value": 3, "unit": "h", "tag": "[В] travel time glacier -> gauge"},
+        "reservoir_k": {"value": 3, "unit": "h", "tag": "[В] linear-reservoir constant (spreads the daily wave)"},
+        "base_flow_monthly": {"value": [1.5, 1.4, 1.5, 2.0, 3.0, 4.0, 4.5, 4.5, 3.5, 2.5, 2.0, 1.7], "unit": "m^3/s, Jan..Dec", "tag": "[В] groundwater + rain + seasonal snow, order of magnitude"}
+      }
+    },
+    {
+      "id": "jergalan_river",
+      "kind": "river_melt",
+      "name_ru": "р. Джергалан (Жыргалан)",
+      "name_en": "Jergalan river",
+      "lat": 42.57, "lon": 78.93,
+      "station": "karakol",
+      "params": {
+        "melt_area": {"value": 8, "unit": "km^2", "tag": "[В] glacier + perennial snow area that melts; not measured here"},
+        "melt_elevation": {"value": 3900, "unit": "m a.s.l.", "tag": "[В] mean elevation of the melting area"},
+        "lag": {"value": 5, "unit": "h", "tag": "[В] travel time glacier -> gauge"},
+        "reservoir_k": {"value": 4, "unit": "h", "tag": "[В] linear-reservoir constant"},
+        "base_flow_monthly": {"value": [3.0, 2.8, 3.0, 4.0, 6.0, 7.0, 7.5, 7.0, 5.5, 4.5, 3.8, 3.2], "unit": "m^3/s, Jan..Dec", "tag": "[В] order of magnitude"}
+      }
+    },
+    {
+      "id": "tup_river",
+      "kind": "river_melt",
+      "name_ru": "р. Тюп",
+      "name_en": "Tüp river",
+      "lat": 42.73, "lon": 78.36,
+      "station": "karakol",
+      "params": {
+        "melt_area": {"value": 6, "unit": "km^2", "tag": "[В] glacier + perennial snow area that melts; not measured here"},
+        "melt_elevation": {"value": 3850, "unit": "m a.s.l.", "tag": "[В] mean elevation of the melting area"},
+        "lag": {"value": 5, "unit": "h", "tag": "[В] travel time glacier -> gauge"},
+        "reservoir_k": {"value": 4, "unit": "h", "tag": "[В] linear-reservoir constant"},
+        "base_flow_monthly": {"value": [2.0, 1.9, 2.2, 3.5, 5.0, 5.5, 5.5, 5.0, 4.0, 3.0, 2.5, 2.1], "unit": "m^3/s, Jan..Dec", "tag": "[В] order of magnitude"}
+      }
+    },
+    {
+      "id": "chon_kyzyl_suu_river",
+      "kind": "river_melt",
+      "name_ru": "р. Чон-Кызыл-Суу (ледник Кара-Баткак в бассейне)",
+      "name_en": "Chon-Kyzyl-Suu river (Kara-Batkak glacier basin)",
+      "lat": 42.30, "lon": 78.00,
+      "station": "karakol",
+      "params": {
+        "melt_area": {"value": 12, "unit": "km^2", "tag": "[В] glacier + perennial snow area that melts; not measured here"},
+        "melt_elevation": {"value": 3800, "unit": "m a.s.l.", "tag": "[В] mean elevation of the melting area"},
+        "lag": {"value": 3, "unit": "h", "tag": "[В] travel time glacier -> gauge"},
+        "reservoir_k": {"value": 3, "unit": "h", "tag": "[В] linear-reservoir constant"},
+        "base_flow_monthly": {"value": [1.2, 1.1, 1.3, 2.0, 3.0, 3.5, 3.8, 3.8, 3.0, 2.2, 1.6, 1.3], "unit": "m^3/s, Jan..Dec", "tag": "[В] order of magnitude"}
+      }
+    },
+    {
+      "id": "chu_boom",
+      "kind": "river_melt",
+      "name_ru": "р. Чу (Чүй) у Боомского ущелья",
+      "name_en": "Chu (Chüy) river at Boom gorge",
+      "lat": 42.55, "lon": 75.90,
+      "station": "balykchy",
+      "params": {
+        "melt_area": {"value": 60, "unit": "km^2", "tag": "[В] glacier + perennial snow area of the upper Chu basin that melts; not measured here"},
+        "melt_elevation": {"value": 3900, "unit": "m a.s.l.", "tag": "[В] mean elevation of the melting area"},
+        "lag": {"value": 12, "unit": "h", "tag": "[В] long travel time from the Kochkor/Joon-Aryk glaciers"},
+        "reservoir_k": {"value": 8, "unit": "h", "tag": "[В] linear-reservoir constant; a long river damps the daily wave"},
+        "base_flow_monthly": {"value": [12, 11, 12, 18, 30, 40, 42, 38, 28, 20, 16, 13], "unit": "m^3/s, Jan..Dec", "tag": "[В] order of magnitude"}
+      }
+    },
+    {
+      "id": "caspian_north_volga_delta",
+      "kind": "sea",
+      "name_ru": "Северный Каспий, взморье дельты Волги",
+      "name_en": "North Caspian, Volga delta front",
+      "lat": 45.55, "lon": 47.95,
+      "params": {
+        "mean_level": {"value": -29.0, "unit": "m, Baltic height system", "tag": "[В] approximate Caspian level of the mid-2020s; it is falling"},
+        "astro_M2_amp": {"value": 0.005, "unit": "m", "tag": "[В] shallow north Caspian damps the already small tide; order of magnitude"},
+        "astro_S2_amp": {"value": 0.002, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_K1_amp": {"value": 0.004, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_O1_amp": {"value": 0.003, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_phase_lag": {"value": 0, "unit": "deg", "tag": "неизвестно: harmonic phases of this gauge not available; 0 = in phase with local equilibrium [В]"},
+        "fetch": {"value": 250000, "unit": "m", "tag": "[В] fetch over the shallow north Caspian"},
+        "setup_depth": {"value": 4, "unit": "m", "tag": "[В] north Caspian is a few metres deep (mean ~4-5 m)"},
+        "onshore_wind_from": {"value": 135, "unit": "deg (direction the wind blows FROM)", "tag": "[В] SE winds drive the surge onto the Volga delta"},
+        "rho_water": {"value": 1005, "unit": "kg/m^3", "tag": "[В] fresh-to-brackish water near the delta"}
+      }
+    },
+    {
+      "id": "caspian_middle_makhachkala",
+      "kind": "sea",
+      "name_ru": "Средний Каспий, Махачкала",
+      "name_en": "Middle Caspian, Makhachkala",
+      "lat": 42.98, "lon": 47.52,
+      "params": {
+        "mean_level": {"value": -29.0, "unit": "m, Baltic height system", "tag": "[В] approximate Caspian level of the mid-2020s; it is falling"},
+        "astro_M2_amp": {"value": 0.02, "unit": "m", "tag": "[В] few-cm order of magnitude"},
+        "astro_S2_amp": {"value": 0.007, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_K1_amp": {"value": 0.01, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_O1_amp": {"value": 0.006, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_phase_lag": {"value": 0, "unit": "deg", "tag": "неизвестно: harmonic phases of this gauge not available; 0 = in phase with local equilibrium [В]"},
+        "fetch": {"value": 120000, "unit": "m", "tag": "[В] effective fetch over the western shelf"},
+        "setup_depth": {"value": 30, "unit": "m", "tag": "[В] effective shelf depth along the fetch"},
+        "onshore_wind_from": {"value": 90, "unit": "deg (direction the wind blows FROM)", "tag": "[В] easterly wind pushes water onto the west coast"},
+        "rho_water": {"value": 1010, "unit": "kg/m^3", "tag": "[В] Caspian salinity ~12-13 g/kg"}
+      }
+    },
+    {
+      "id": "caspian_south_baku",
+      "kind": "sea",
+      "name_ru": "Южный Каспий, Баку",
+      "name_en": "South Caspian, Baku",
+      "lat": 40.35, "lon": 49.85,
+      "params": {
+        "mean_level": {"value": -29.0, "unit": "m, Baltic height system", "tag": "[В] approximate Caspian level of the mid-2020s; it is falling"},
+        "astro_M2_amp": {"value": 0.03, "unit": "m", "tag": "[В] few-cm order of magnitude"},
+        "astro_S2_amp": {"value": 0.01, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_K1_amp": {"value": 0.012, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_O1_amp": {"value": 0.007, "unit": "m", "tag": "[В] order of magnitude"},
+        "astro_phase_lag": {"value": 0, "unit": "deg", "tag": "неизвестно: harmonic phases of this gauge not available; 0 = in phase with local equilibrium [В]"},
+        "fetch": {"value": 100000, "unit": "m", "tag": "[В] effective fetch"},
+        "setup_depth": {"value": 25, "unit": "m", "tag": "[В] effective shelf depth along the fetch"},
+        "onshore_wind_from": {"value": 150, "unit": "deg (direction the wind blows FROM)", "tag": "[В] SSE wind pushes water into Baku bay; the northerly khazri drives setdown"},
+        "rho_water": {"value": 1010, "unit": "kg/m^3", "tag": "[В] Caspian salinity ~12-13 g/kg"}
+      }
+    },
+    {
+      "id": "volga_astrakhan",
+      "kind": "river_seasonal",
+      "name_ru": "р. Волга у Астрахани",
+      "name_en": "Volga river at Astrakhan",
+      "lat": 46.35, "lon": 48.03,
+      "params": {
+        "flood_peak_doy": {"value": 160, "unit": "day of year", "tag": "[В] spring-summer flood (regulated by the Volga cascade) peaks late May..June"},
+        "flood_amplitude": {"value": 2.5, "unit": "m above winter low water", "tag": "[В] order of magnitude of the stage rise"},
+        "flood_sigma": {"value": 25, "unit": "days", "tag": "[В] width of the flood wave"},
+        "surge_fraction": {"value": 0.0, "unit": "1", "tag": "[В] Astrakhan is ~100 km above the delta front; the surge share there is unknown and taken as 0"},
+        "fetch": {"value": 250000, "unit": "m", "tag": "[В] north Caspian fetch (used only with surge_fraction)"},
+        "setup_depth": {"value": 4, "unit": "m", "tag": "[В] north Caspian depth"},
+        "onshore_wind_from": {"value": 135, "unit": "deg (direction the wind blows FROM)", "tag": "[В] SE"},
+        "rho_water": {"value": 1000, "unit": "kg/m^3", "tag": "[В] fresh water"}
+      }
+    },
+    {
+      "id": "ural_atyrau",
+      "kind": "river_seasonal",
+      "name_ru": "р. Урал (Жайык) у Атырау",
+      "name_en": "Ural (Zhaiyk) river at Atyrau",
+      "lat": 47.10, "lon": 51.90,
+      "params": {
+        "flood_peak_doy": {"value": 130, "unit": "day of year", "tag": "[В] spring snow-melt flood peaks in May"},
+        "flood_amplitude": {"value": 2.0, "unit": "m above winter low water", "tag": "[В] order of magnitude"},
+        "flood_sigma": {"value": 20, "unit": "days", "tag": "[В] width of the flood wave"},
+        "surge_fraction": {"value": 0.3, "unit": "1", "tag": "[В] Atyrau is close to the sea; share of the coastal surge reaching the city is unknown, 0.3 is a guess"},
+        "fetch": {"value": 200000, "unit": "m", "tag": "[В] north-east Caspian fetch"},
+        "setup_depth": {"value": 3, "unit": "m", "tag": "[В] very shallow north-east Caspian"},
+        "onshore_wind_from": {"value": 225, "unit": "deg (direction the wind blows FROM)", "tag": "[В] SW wind pushes water onto the north-east coast"},
+        "rho_water": {"value": 1000, "unit": "kg/m^3", "tag": "[В] fresh water"}
+      }
+    }
+  ]
+}
